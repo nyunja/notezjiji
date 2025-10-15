@@ -111,12 +111,31 @@ export class ItemService {
       query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
     }
 
+    // Sorting
+    const sortBy = filters?.sort || 'newest';
+    switch (sortBy) {
+      case 'oldest':
+        query = query.order('created_at', { ascending: true });
+        break;
+      case 'price-low':
+        query = query.order('price', { ascending: true });
+        break;
+      case 'price-high':
+        query = query.order('price', { ascending: false });
+        break;
+      case 'popular':
+        query = query.order('purchase_count', { ascending: false });
+        break;
+      case 'newest':
+      default:
+        query = query.order('created_at', { ascending: false });
+        break;
+    }
+
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    const { data: items, error, count } = await query
-      .order('created_at', { ascending: false })
-      .range(from, to);
+    const { data: items, error, count } = await query.range(from, to);
 
     if (error) {
       throw new AppError(500, 'Failed to fetch items');

@@ -2,6 +2,8 @@ import { Worker, Job } from 'bullmq';
 import { redis } from '../config/redis.js';
 import { logger } from '../utils/logger.js';
 import { paymentService } from '../services/paymentService.js';
+import { emailService } from '../services/emailService.js';
+import { supabase } from '../config/database.js';
 
 const connection = redis;
 
@@ -23,7 +25,111 @@ const emailWorker = new Worker(
   async (job: Job) => {
     logger.info(`Processing email job: ${job.id}`, job.data);
 
-    return { sent: true };
+    try {
+      switch (job.name) {
+        case 'item-approved': {
+          const { data: user } = await supabase
+            .from('users')
+            .select('email, full_name')
+            .eq('id', job.data.uploaderId)
+            .single();
+
+          if (user) {
+            await emailService.sendItemApprovalEmail(
+              user.email,
+              user.full_name,
+              job.data.itemTitle
+            );
+          }
+          break;
+        }
+
+        case 'item-rejected': {
+          const { data: user } = await supabase
+            .from('users')
+            .select('email, full_name')
+            .eq('id', job.data.uploaderId)
+            .single();
+
+          if (user) {
+            await emailService.sendItemRejectionEmail(
+              user.email,
+              user.full_name,
+              job.data.itemTitle,
+              job.data.reason
+            );
+          }
+          break;
+        }
+
+        case 'payout-approved': {
+          const { data: user } = await supabase
+            .from('users')
+            .select('email, full_name')
+            .eq('id', job.data.uploaderId)
+            .single();
+
+          if (user) {
+            await emailService.sendPayoutApprovedEmail(
+              user.email,
+              user.full_name,
+              job.data.amount
+            );
+          }
+          break;
+        }
+
+        case 'payout-rejected': {
+          const { data: user } = await supabase
+            .from('users')
+            .select('email, full_name')
+            .eq('id', job.data.uploaderId)
+            .single();
+
+          if (user) {
+            await emailService.sendPayoutRejectedEmail(
+              user.email,
+              user.full_name,
+              job.data.amount,
+              job.data.reason
+            );
+          }
+          break;
+        }
+
+        case 'purchase-confirmation': {
+          const { data: purchase } = await supabase
+            .from('purchases')
+            .select('*, buyer:users!purchases_buyer_id_fkey(email, full_name), item:items(title)')
+            .eq('id', job.data.purchaseId)
+            .single();
+
+          if (purchase && purchase.buyer) {
+            await emailService.sendPurchaseConfirmationEmail(
+              (purchase.buyer as any).email,
+              (purchase.buyer as any).full_name,
+              (purchase.item as any).title,
+              purchase.amount
+            );
+          }
+          break;
+        }
+
+        case 'welcome': {
+          await emailService.sendWelcomeEmail(
+            job.data.email,
+            job.data.name,
+            job.data.role
+          );
+          break;
+        }
+      }
+
+      return { sent: true };
+    } catch (error) {
+      logger.error('Email job failed:', error);
+      throw error;
+    }
   },
   {
     connection,
