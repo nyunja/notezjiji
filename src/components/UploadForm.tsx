@@ -54,8 +54,9 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
       setTimeout(() => {
         onSuccess();
       }, 2000);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to upload item');
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      setError(axiosError.response?.data?.message || 'Failed to upload item');
     } finally {
       setUploading(false);
     }

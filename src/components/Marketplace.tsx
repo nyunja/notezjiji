@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Search, Filter, Download } from 'lucide-react';
+import { ShoppingCart, Search } from 'lucide-react';
 import { itemsAPI } from '../lib/api';
 
 interface Item {
@@ -23,11 +23,14 @@ export default function Marketplace({ onPurchase }: { onPurchase: (itemIds: stri
   const [search, setSearch] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [cart, setCart] = useState<string[]>([]);
 
   useEffect(() => {
     loadItems();
-  }, [selectedCourse, selectedYear, search]);
+  }, [selectedCourse, selectedYear, search, sortBy]);
 
   const loadItems = async () => {
     try {
@@ -35,9 +38,21 @@ export default function Marketplace({ onPurchase }: { onPurchase: (itemIds: stri
       const response = await itemsAPI.getMarketplace({
         search,
         course: selectedCourse,
-        year: selectedYear
+        year: selectedYear,
+        sort: sortBy
       });
-      setItems(response.data.data.items || []);
+
+      let filteredItems = response.data.data.items || [];
+
+      // Client-side price filtering
+      if (minPrice) {
+        filteredItems = filteredItems.filter((item: Item) => item.price >= parseFloat(minPrice));
+      }
+      if (maxPrice) {
+        filteredItems = filteredItems.filter((item: Item) => item.price <= parseFloat(maxPrice));
+      }
+
+      setItems(filteredItems);
     } catch (error) {
       console.error('Failed to load marketplace items:', error);
     } finally {
@@ -89,9 +104,9 @@ export default function Marketplace({ onPurchase }: { onPurchase: (itemIds: stri
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-4">
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="relative">
+      <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
+        <div className="grid md:grid-cols-4 gap-4">
+          <div className="relative md:col-span-2">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -125,6 +140,54 @@ export default function Marketplace({ onPurchase }: { onPurchase: (itemIds: stri
             <option value="2022">2022</option>
             <option value="2021">2021</option>
           </select>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium text-gray-700">Sort:</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="popular">Most Popular</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium text-gray-700">Price Range:</label>
+            <input
+              type="number"
+              placeholder="Min"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <span className="text-gray-500">-</span>
+            <input
+              type="number"
+              placeholder="Max"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {(minPrice || maxPrice) && (
+            <button
+              onClick={() => {
+                setMinPrice('');
+                setMaxPrice('');
+              }}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Clear
+            </button>
+          )}
         </div>
       </div>
 

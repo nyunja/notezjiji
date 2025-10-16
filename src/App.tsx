@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
-import { LogIn, UserPlus, LogOut, Upload, ShoppingCart, FileText, DollarSign, Home } from 'lucide-react';
+import { LogIn, UserPlus, LogOut, Upload, ShoppingCart, FileText, DollarSign, Home, Shield, CheckSquare, Wallet, User as UserIcon, Users } from 'lucide-react';
 import Marketplace from './components/Marketplace';
 import UploadForm from './components/UploadForm';
 import PurchaseHistory from './components/PurchaseHistory';
 import UploaderDashboard from './components/UploaderDashboard';
+import PaymentCallback from './components/PaymentCallback';
+import AdminDashboard from './components/AdminDashboard';
+import AdminItemApproval from './components/AdminItemApproval';
+import AdminPayoutApproval from './components/AdminPayoutApproval';
+import AdminUserManagement from './components/AdminUserManagement';
+import UserProfile from './components/UserProfile';
+import NotificationCenter from './components/NotificationCenter';
 import { paymentAPI } from './lib/api';
 
-type View = 'home' | 'marketplace' | 'upload' | 'purchases' | 'dashboard';
+type View = 'home' | 'marketplace' | 'upload' | 'purchases' | 'dashboard' | 'payment-callback' | 'admin-dashboard' | 'admin-items' | 'admin-payouts' | 'admin-users' | 'profile';
 
 function App() {
   const { user, loading, login, register, logout } = useAuth();
@@ -19,6 +26,13 @@ function App() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [currentView, setCurrentView] = useState<View>('home');
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('reference')) {
+      setCurrentView('payment-callback');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +139,54 @@ function App() {
                     </button>
                   </>
                 )}
+                {user.role === 'admin' && (
+                  <>
+                    <button
+                      onClick={() => setCurrentView('admin-dashboard')}
+                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
+                        currentView === 'admin-dashboard'
+                          ? 'bg-red-100 text-red-700'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span>Admin</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentView('admin-items')}
+                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
+                        currentView === 'admin-items'
+                          ? 'bg-red-100 text-red-700'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <CheckSquare className="w-4 h-4" />
+                      <span>Items</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentView('admin-payouts')}
+                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
+                        currentView === 'admin-payouts'
+                          ? 'bg-red-100 text-red-700'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Wallet className="w-4 h-4" />
+                      <span>Payouts</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentView('admin-users')}
+                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
+                        currentView === 'admin-users'
+                          ? 'bg-red-100 text-red-700'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <Users className="w-4 h-4" />
+                      <span>Users</span>
+                    </button>
+                  </>
+                )}
                 <button
                   onClick={() => setCurrentView('purchases')}
                   className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
@@ -136,11 +198,25 @@ function App() {
                   <FileText className="w-4 h-4" />
                   <span>Purchases</span>
                 </button>
-                <div className="flex items-center space-x-2 border-l pl-4">
-                  <span className="text-sm text-gray-600">{user.email}</span>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                    {user.role}
-                  </span>
+                <div className="flex items-center space-x-3 border-l pl-4">
+                  <NotificationCenter />
+                  <button
+                    onClick={() => setCurrentView('profile')}
+                    className={`p-2 rounded-lg transition ${
+                      currentView === 'profile'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                    title="Profile"
+                  >
+                    <UserIcon className="w-5 h-5" />
+                  </button>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-600">{user.email}</span>
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                      {user.role}
+                    </span>
+                  </div>
                   <button
                     onClick={handleLogout}
                     className="flex items-center space-x-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
@@ -207,12 +283,20 @@ function App() {
             </div>
           )}
 
+          {currentView === 'payment-callback' && (
+            <PaymentCallback onComplete={() => setCurrentView('purchases')} />
+          )}
           {currentView === 'marketplace' && <Marketplace onPurchase={handlePurchase} />}
           {currentView === 'upload' && user.role === 'uploader' && (
             <UploadForm onSuccess={() => setCurrentView('dashboard')} />
           )}
           {currentView === 'purchases' && <PurchaseHistory />}
           {currentView === 'dashboard' && user.role === 'uploader' && <UploaderDashboard />}
+          {currentView === 'admin-dashboard' && user.role === 'admin' && <AdminDashboard />}
+          {currentView === 'admin-items' && user.role === 'admin' && <AdminItemApproval />}
+          {currentView === 'admin-payouts' && user.role === 'admin' && <AdminPayoutApproval />}
+          {currentView === 'admin-users' && user.role === 'admin' && <AdminUserManagement />}
+          {currentView === 'profile' && <UserProfile />}
         </div>
       </div>
     );

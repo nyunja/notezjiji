@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, FileText, TrendingUp, Download } from 'lucide-react';
+import { DollarSign, FileText, Download } from 'lucide-react';
 import { itemsAPI, paymentAPI } from '../lib/api';
 
 interface Stats {

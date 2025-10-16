@@ -4,16 +4,17 @@ import { paymentAPI } from '../lib/api';
 
 interface Purchase {
   id: string;
-  total_amount: number;
-  platform_fee: number;
-  uploader_amount: number;
+  amount: number;
   created_at: string;
-  items: Array<{
+  item: {
     id: string;
     title: string;
     course: string;
-    file_size: number;
-  }>;
+    year: string;
+    thumbnail_path: string;
+  };
+  download_count: number;
+  max_downloads: number;
 }
 
 export default function PurchaseHistory() {
@@ -72,46 +73,49 @@ export default function PurchaseHistory() {
         <div className="space-y-4">
           {purchases.map((purchase) => (
             <div key={purchase.id} className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-sm text-gray-600">
-                    {new Date(purchase.created_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
-                  <p className="text-lg font-bold text-gray-900 mt-1">
-                    ₦{purchase.total_amount.toLocaleString()}
-                  </p>
-                </div>
-                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                  Completed
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                {purchase.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{item.title}</h4>
-                      <p className="text-sm text-gray-600">{item.course}</p>
-                    </div>
-                    <button
-                      onClick={() => handleDownload(item.id)}
-                      disabled={downloading === item.id}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>{downloading === item.id ? 'Loading...' : 'Download'}</span>
-                    </button>
+              <div className="flex items-center space-x-4">
+                {purchase.item.thumbnail_path && (
+                  <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                    <img
+                      src={purchase.item.thumbnail_path}
+                      alt={purchase.item.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                ))}
+                )}
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 mb-1">{purchase.item.title}</h4>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {purchase.item.course} • {purchase.item.year}
+                  </p>
+                  <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <span>₦{Number(purchase.amount).toLocaleString()}</span>
+                    <span>•</span>
+                    <span>Downloads: {purchase.download_count}/{purchase.max_downloads}</span>
+                    <span>•</span>
+                    <span>
+                      {new Date(purchase.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleDownload(purchase.item.id)}
+                  disabled={downloading === purchase.item.id || purchase.download_count >= purchase.max_downloads}
+                  className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>
+                    {downloading === purchase.item.id
+                      ? 'Loading...'
+                      : purchase.download_count >= purchase.max_downloads
+                      ? 'Limit Reached'
+                      : 'Download'}
+                  </span>
+                </button>
               </div>
             </div>
           ))}

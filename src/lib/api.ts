@@ -66,17 +66,19 @@ export const authAPI = {
 };
 
 export const itemsAPI = {
-  getMarketplace: (params?: any) =>
+  getMarketplace: (params?: unknown) =>
     api.get('/items/marketplace', { params }),
   getItem: (id: string) =>
     api.get(`/items/${id}`),
   getUserItems: () =>
     api.get('/items/my-items'),
+  getItemStats: () =>
+    api.get('/items/stats'),
   createItem: (data: FormData) =>
     api.post('/items', data, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
-  updateItem: (id: string, data: any) =>
+  updateItem: (id: string, data: unknown) =>
     api.put(`/items/${id}`, data),
   deleteItem: (id: string) =>
     api.delete(`/items/${id}`)
@@ -90,7 +92,9 @@ export const paymentAPI = {
   getUserPurchases: () =>
     api.get('/payments/purchases'),
   getDownloadUrl: (itemId: string) =>
-    api.get(`/payments/download/${itemId}`)
+    api.get(`/payments/download/${itemId}`),
+  getUploaderEarnings: () =>
+    api.get('/payments/earnings')
 };
 
 export default api;
