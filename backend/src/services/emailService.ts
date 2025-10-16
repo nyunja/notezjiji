@@ -1,4 +1,6 @@
 import { logger } from '../utils/logger.js';
+import nodemailer from 'nodemailer';
+import type { Transporter } from 'nodemailer';
 
 interface EmailOptions {
   to: string;
@@ -10,11 +12,46 @@ interface EmailOptions {
 export class EmailService {
   private from = process.env.EMAIL_FROM || 'noreply@academicnotes.com';
   private serviceType = process.env.EMAIL_SERVICE || 'console';
+  private transporter: Transporter | null = null;
+
+  constructor() {
+    // Initialize email transporter if SMTP is configured
+    if (this.serviceType === 'smtp' && process.env.SMTP_HOST) {
+      this.transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      // Verify connection configuration
+      this.transporter.verify((error) => {
+        if (error) {
+          logger.error('SMTP connection error:', error);
+        } else {
+          logger.info('SMTP server is ready to send emails');
+        }
+      });
+    } else if (this.serviceType === 'sendgrid' && process.env.SENDGRID_API_KEY) {
+      // SendGrid configuration
+      this.transporter = nodemailer.createTransport({
+        host: 'smtp.sendgrid.net',
+        port: 587,
+        auth: {
+          user: 'apikey',
+          pass: process.env.SENDGRID_API_KEY,
+        },
+      });
+    }
+  }
 
   async sendEmail(options: EmailOptions): Promise<boolean> {
     try {
-      // For development, log to console
-      if (this.serviceType === 'console' || process.env.NODE_ENV === 'development') {
+      // For development or console mode, log to console
+      if (this.serviceType === 'console' || (!this.transporter && process.env.NODE_ENV === 'development')) {
         logger.info('📧 Email would be sent:');
         logger.info(`To: ${options.to}`);
         logger.info(`Subject: ${options.subject}`);
@@ -22,9 +59,21 @@ export class EmailService {
         return true;
       }
 
-      // TODO: Integrate with SendGrid, AWS SES, or other email service
-      // For production, you would implement the actual email sending here
-      logger.warn('Email service not configured for production');
+      // Send email using configured transporter
+      if (this.transporter) {
+        const info = await this.transporter.sendMail({
+          from: this.from,
+          to: options.to,
+          subject: options.subject,
+          text: options.text,
+          html: options.html,
+        });
+
+        logger.info(`Email sent successfully: ${info.messageId}`);
+        return true;
+      }
+
+      logger.warn('Email service not configured - email not sent');
       return false;
     } catch (error) {
       logger.error('Failed to send email:', error);

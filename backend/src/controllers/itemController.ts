@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ItemService } from '../services/itemService.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { uploadLimiter, searchLimiter } from '../middleware/rateLimiter.js';
 
 const itemService = new ItemService();
 

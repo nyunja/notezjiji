@@ -1,9 +1,8 @@
 import { supabase } from '../config/database.js';
-import { Item, ItemStatus, UserRole } from '../types/index.js';
+import { Item, ItemStatus } from '../types/index.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { cacheService } from '../config/redis.js';
 import { fileProcessingQueue } from '../config/queues.js';
-import { nanoid } from 'nanoid';
 
 export class ItemService {
   async createItem(

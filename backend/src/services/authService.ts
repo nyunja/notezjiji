@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { supabase } from '../config/database.js';
-import { User, JWTPayload, AuthTokens } from '../types/index.js';
+import { User, AuthTokens, UserRole } from '../types/index.js';
 import { generateTokens, verifyRefreshToken, hashToken, revokeRefreshToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { cacheService } from '../config/redis.js';
@@ -46,7 +46,7 @@ export class AuthService {
     const tokens = await generateTokens({
       userId: user.id,
       email: user.email,
-      role: user.role as any
+      role: user.role as UserRole
     });
 
     return { user, tokens };
@@ -109,12 +109,13 @@ export class AuthService {
       {
         userId: user.id,
         email: user.email,
-        role: user.role as any
+        role: user.role as UserRole
       },
       deviceInfo,
       ipAddress
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password_hash, ...userWithoutPassword } = user;
 
     return { user: userWithoutPassword, tokens };
@@ -150,6 +151,7 @@ export class AuthService {
       );
 
       return newTokens;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new AppError(401, 'Invalid refresh token');
     }
