@@ -193,7 +193,7 @@ export class PaymentService {
   async getUserPurchases(userId: string) {
     const { data: purchases, error } = await supabase
       .from('purchases')
-      .select('*, item:items(id, title, thumbnail_path, course, year)')
+      .select('*, item:items(id, title, thumbnail_path, course, year, file_size, page_count)')
       .eq('buyer_id', userId)
       .eq('payment_status', PaymentStatus.SUCCESS)
       .order('created_at', { ascending: false });
