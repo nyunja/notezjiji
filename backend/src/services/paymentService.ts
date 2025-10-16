@@ -6,6 +6,37 @@ import { paymentQueue, emailQueue } from '../config/queues.js';
 import { nanoid } from 'nanoid';
 import { logger } from '../utils/logger.js';
 
+interface PaystackResponse {
+  status: boolean;
+  message?: string;
+  data: {
+    access_code: string;
+    authorization_url: string;
+    reference: string;
+    [key: string]: unknown;
+  };
+}
+
+interface PaystackVerifyResponse {
+  status: boolean;
+  message?: string;
+  data: {
+    status: string;
+    reference: string;
+    amount: number;
+    [key: string]: unknown;
+  };
+}
+
+interface PaystackWebhookPayload {
+  event: string;
+  data: {
+    reference: string;
+    status: string;
+    [key: string]: unknown;
+  };
+}
+
 export class PaymentService {
   private paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
   private paystackBaseUrl = 'https://api.paystack.co';
@@ -56,7 +87,7 @@ export class PaymentService {
       })
     });
 
-    const result = await response.json() as any;
+    const result = await response.json() as PaystackResponse;
 
     if (!result.status) {
       logger.error('Paystack initialization failed:', result);
@@ -83,14 +114,14 @@ export class PaymentService {
     };
   }
 
-  async verifyPayment(reference: string, userId: string) {
+  async verifyPayment(reference: string) {
     const response = await fetch(`${this.paystackBaseUrl}/transaction/verify/${reference}`, {
       headers: {
         Authorization: `Bearer ${this.paystackSecretKey}`
       }
     });
 
-    const result = await response.json() as any;
+    const result = await response.json() as PaystackVerifyResponse;
 
     if (!result.status || result.data.status !== 'success') {
       throw new AppError(400, 'Payment verification failed');
@@ -104,7 +135,7 @@ export class PaymentService {
     return result.data;
   }
 
-  async handleWebhook(payload: any, signature: string) {
+  async handleWebhook(payload: PaystackWebhookPayload, signature: string) {
     const hash = crypto
       .createHmac('sha512', this.paystackSecretKey!)
       .update(JSON.stringify(payload))
@@ -122,7 +153,7 @@ export class PaymentService {
     return { received: true };
   }
 
-  async processSuccessfulPayment(reference: string, paystackData: any) {
+  async processSuccessfulPayment(reference: string, paystackData: Record<string, unknown>) {
     const { data: purchases } = await supabase
       .from('purchases')
       .select('*, item:items(*)')
@@ -175,34 +206,62 @@ export class PaymentService {
   }
 
   async getDownloadUrl(userId: string, itemId: string) {
-    const { data: purchase } = await supabase
+    // Verify purchase exists and is valid
+    const { data: purchase, error: purchaseError } = await supabase
       .from('purchases')
-      .select('*, item:items(file_path)')
+      .select('*, item:items(file_path, title)')
       .eq('buyer_id', userId)
       .eq('item_id', itemId)
       .eq('payment_status', PaymentStatus.SUCCESS)
       .maybeSingle();
 
+    if (purchaseError) {
+      logger.error('Error fetching purchase:', purchaseError);
+      throw new AppError(500, 'Failed to verify purchase');
+    }
+
     if (!purchase) {
-      throw new AppError(404, 'Purchase not found');
+      throw new AppError(404, 'Purchase not found. You must buy this item first.');
     }
 
+    // Check download limit
     if (purchase.download_count >= purchase.max_downloads) {
-      throw new AppError(400, 'Download limit reached');
+      throw new AppError(400, `Download limit reached. Maximum ${purchase.max_downloads} downloads allowed.`);
     }
 
-    const { data: signedUrl } = await supabase.storage
+    const item = purchase.item as { file_path?: string; title: string } | null;
+    const filePath = item?.file_path;
+    if (!filePath) {
+      logger.error(`File path not found for item ${itemId}`);
+      throw new AppError(500, 'File not available for download');
+    }
+
+    // Generate signed URL with 15 minutes expiration
+    const { data: signedUrl, error: urlError } = await supabase.storage
       .from('originals')
-      .createSignedUrl((purchase.item as any).file_path, 900);
+      .createSignedUrl(filePath, 900); // 900 seconds = 15 minutes
 
-    if (!signedUrl) {
-      throw new AppError(500, 'Failed to generate download URL');
+    if (urlError || !signedUrl) {
+      logger.error('Error generating signed URL:', urlError);
+      throw new AppError(500, 'Failed to generate download URL. Please try again.');
     }
 
-    await supabase
+    // Update download count
+    const { error: updateError } = await supabase
       .from('purchases')
-      .update({ download_count: purchase.download_count + 1 })
+      .update({
+        download_count: purchase.download_count + 1,
+        last_download_at: new Date().toISOString()
+      })
       .eq('id', purchase.id);
+
+    if (updateError) {
+      logger.error('Error updating download count:', updateError);
+      // Don't throw error here - download should still work
+    }
+
+    // Log download for analytics
+    logger.info(`Download generated: User ${userId}, Item ${itemId}, Count: ${purchase.download_count + 1}`);
 
     return signedUrl.signedUrl;
   }

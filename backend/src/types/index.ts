@@ -81,7 +81,7 @@ export interface Purchase {
   transaction_date?: string;
   download_count: number;
   max_downloads: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
 }
 
@@ -92,7 +92,7 @@ export interface Payout {
   platform_fee: number;
   paystack_fee: number;
   net_amount: number;
-  bank_details: Record<string, any>;
+  bank_details: Record<string, unknown>;
   status: PayoutStatus;
   paystack_transfer_code?: string;
   admin_notes?: string;
