@@ -86,9 +86,12 @@ export default function PurchaseHistory() {
 
       setSuccessMessage(`Successfully downloaded "${itemTitle}"`);
       setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to download file:', error);
-      setError(error.response?.data?.message || 'Failed to download file. Please try again.');
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error.response as { data?: { message?: string } })?.data?.message
+        : undefined;
+      setError(errorMessage || 'Failed to download file. Please try again.');
       setTimeout(() => setError(null), 5000);
     } finally {
       setDownloading(null);
