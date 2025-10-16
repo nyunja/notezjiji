@@ -4,14 +4,29 @@ Production-grade backend API for the Academic Notes Marketplace with comprehensi
 
 ## Features
 
+### Authentication & Security
 - JWT authentication with refresh token rotation
 - Multi-layer rate limiting with Redis
-- BullMQ job queues for async processing
-- Comprehensive error handling and logging
 - Role-based access control (RBAC)
-- Account lockout protection
-- Session management
+- Account lockout protection after failed attempts
+- Session management with device tracking
 - Input validation with Zod
+
+### File Processing
+- Automated PDF and image processing
+- PDF page count extraction and metadata
+- Thumbnail generation from first page of PDFs
+- Image resizing and optimization with Sharp
+- Preview generation (first 3 pages for PDFs, resized for images)
+- Automatic file type detection via magic bytes
+- Storage integration with Supabase buckets
+
+### Background Processing
+- BullMQ job queues for async processing
+- File processing worker for uploads
+- Email notification worker
+- Payment processing worker
+- Comprehensive error handling and logging
 
 ## Prerequisites
 
@@ -77,14 +92,24 @@ npm run worker
 
 ## Architecture
 
+### Core Stack
 - **Express.js** - Web framework
 - **Supabase** - PostgreSQL database, file storage, RLS
 - **Upstash Redis** - Caching, rate limiting, session storage
 - **BullMQ** - Job queue processing
+
+### Security & Auth
 - **JWT** - Authentication tokens
-- **Bcrypt** - Password hashing
+- **Bcrypt** - Password hashing (12 rounds)
 - **Zod** - Input validation
-- **Winston** - Logging
+
+### File Processing
+- **pdf-to-img** - PDF to image conversion for thumbnails
+- **pdf-lib** - PDF metadata extraction and manipulation
+- **Sharp** - Image processing and optimization
+
+### Observability
+- **Winston** - Structured logging
 
 ## Security Features
 
