@@ -86,23 +86,26 @@ export class AdminService {
     const { error: updateError } = await supabase
       .from('items')
       .update({
-        approval_status: 'approved',
-        approved_by: adminId,
-        approved_at: new Date().toISOString()
+        approval_status: 'approved'
       })
       .eq('id', itemId);
 
     if (updateError) {
+      logger.error('Supabase error approving item:', updateError);
       throw new AppError(500, 'Failed to approve item');
     }
 
-    await supabase.from('audit_logs').insert({
+    const { error: auditError } = await supabase.from('audit_logs').insert({
       user_id: adminId,
       action: 'ITEM_APPROVED',
-      resource_type: 'item',
-      resource_id: itemId,
-      metadata: { itemTitle: item.title }
+      entity_type: 'item',
+      entity_id: itemId,
+      changes: { itemTitle: item.title }
     });
+
+    if (auditError) {
+      logger.error('Failed to insert audit log for item approval:', auditError);
+    }
 
     await emailQueue.add('item-approved', {
       uploaderId: item.uploader_id,
@@ -134,9 +137,7 @@ export class AdminService {
       .from('items')
       .update({
         approval_status: 'rejected',
-        rejection_reason: reason,
-        approved_by: adminId,
-        approved_at: new Date().toISOString()
+        rejection_reason: reason
       })
       .eq('id', itemId);
 
@@ -147,9 +148,9 @@ export class AdminService {
     await supabase.from('audit_logs').insert({
       user_id: adminId,
       action: 'ITEM_REJECTED',
-      resource_type: 'item',
-      resource_id: itemId,
-      metadata: { itemTitle: item.title, reason }
+      entity_type: 'item',
+      entity_id: itemId,
+      changes: { itemTitle: item.title, reason }
     });
 
     await emailQueue.add('item-rejected', {
@@ -168,7 +169,7 @@ export class AdminService {
     const offset = (page - 1) * limit;
     let query = supabase
       .from('users')
-      .select('id, email, full_name, role, failed_login_attempts, account_locked_until, created_at', { count: 'exact' });
+      .select('id, email, full_name, role, failed_login_attempts, created_at', { count: 'exact' });
 
     if (filters?.role) {
       query = query.eq('role', filters.role);
@@ -183,6 +184,7 @@ export class AdminService {
       .range(offset, offset + limit - 1);
 
     if (error) {
+      logger.error('Supabase error fetching users:', error);
       throw new AppError(500, 'Failed to fetch users');
     }
 
@@ -224,9 +226,9 @@ export class AdminService {
     await supabase.from('audit_logs').insert({
       user_id: adminId,
       action: 'USER_ROLE_UPDATED',
-      resource_type: 'user',
-      resource_id: userId,
-      metadata: { oldRole: user.role, newRole, userEmail: user.email }
+      entity_type: 'user',
+      entity_id: userId,
+      changes: { oldRole: user.role, newRole, userEmail: user.email }
     });
 
     logger.info(`User ${userId} role updated from ${user.role} to ${newRole} by admin ${adminId}`);
@@ -238,8 +240,7 @@ export class AdminService {
     const { error } = await supabase
       .from('users')
       .update({
-        failed_login_attempts: 0,
-        account_locked_until: null
+        failed_login_attempts: 0
       })
       .eq('id', userId);
 
@@ -250,8 +251,8 @@ export class AdminService {
     await supabase.from('audit_logs').insert({
       user_id: adminId,
       action: 'ACCOUNT_UNLOCKED',
-      resource_type: 'user',
-      resource_id: userId
+      entity_type: 'user',
+      entity_id: userId
     });
 
     logger.info(`Account ${userId} unlocked by admin ${adminId}`);
@@ -314,9 +315,9 @@ export class AdminService {
     await supabase.from('audit_logs').insert({
       user_id: adminId,
       action: 'PAYOUT_APPROVED',
-      resource_type: 'payout',
-      resource_id: payoutId,
-      metadata: { amount: payout.amount, uploaderId: payout.uploader_id }
+      entity_type: 'payout',
+      entity_id: payoutId,
+      changes: { amount: payout.amount, uploaderId: payout.uploader_id }
     });
 
     logger.info(`Payout ${payoutId} approved by admin ${adminId}`);
@@ -355,9 +356,9 @@ export class AdminService {
     await supabase.from('audit_logs').insert({
       user_id: adminId,
       action: 'PAYOUT_REJECTED',
-      resource_type: 'payout',
-      resource_id: payoutId,
-      metadata: { amount: payout.amount, uploaderId: payout.uploader_id, reason }
+      entity_type: 'payout',
+      entity_id: payoutId,
+      changes: { amount: payout.amount, uploaderId: payout.uploader_id, reason }
     });
 
     await emailQueue.add('payout-rejected', {

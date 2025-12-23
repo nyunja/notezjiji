@@ -1,22 +1,10 @@
 /*
-  # Create audit logs table
-
-  1. New Tables
-    - `audit_logs`
-      - `id` (uuid, primary key)
-      - `user_id` (uuid, foreign key to users)
-      - `action` (text) - Action type performed
-      - `resource_type` (text) - Type of resource affected
-      - `resource_id` (uuid) - ID of affected resource
-      - `metadata` (jsonb) - Additional context
-      - `created_at` (timestamp)
-
-  2. Security
+  1. Security
     - Enable RLS on `audit_logs` table
     - Only admins can read audit logs
     - System can insert logs (no user access)
 
-  3. Indexes
+  2. Indexes
     - Index on user_id for filtering
     - Index on action for searching
     - Index on created_at for sorting
