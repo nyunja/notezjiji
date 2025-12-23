@@ -40,7 +40,7 @@ export const verifyPayment = async (req: Request, res: Response, next: NextFunct
 
     const { reference } = req.params;
 
-    const purchase = await paymentService.verifyPayment(reference, userId);
+    const purchase = await paymentService.verifyPayment(reference);
 
     res.json({
       success: true,

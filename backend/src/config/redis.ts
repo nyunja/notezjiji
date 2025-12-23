@@ -9,7 +9,7 @@ if (!process.env.UPSTASH_REDIS_URL) {
 }
 
 export const redis = new Redis(process.env.UPSTASH_REDIS_URL, {
-  maxRetriesPerRequest: 3,
+  maxRetriesPerRequest: null, // Required for BullMQ compatibility
   enableReadyCheck: false,
   retryStrategy(times) {
     const delay = Math.min(times * 50, 2000);
