@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, DollarSign, Clock } from 'lucide-react';
 import axios from 'axios';
+import { getErrorMessage } from '../lib/errorUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
@@ -57,8 +58,7 @@ export default function AdminPayoutApproval() {
       setPayouts(payouts.filter(payout => payout.id !== payoutId));
       alert('Payout approved successfully');
     } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string } } };
-      alert(axiosError.response?.data?.message || 'Failed to approve payout');
+      alert(getErrorMessage(error, 'Failed to approve payout'));
     } finally {
       setProcessing(null);
     }
@@ -84,8 +84,7 @@ export default function AdminPayoutApproval() {
       setRejectionReason('');
       alert('Payout rejected successfully');
     } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string } } };
-      alert(axiosError.response?.data?.message || 'Failed to reject payout');
+      alert(getErrorMessage(error, 'Failed to reject payout'));
     } finally {
       setProcessing(null);
     }

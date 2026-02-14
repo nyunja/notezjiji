@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 import { itemsAPI } from '../lib/api';
+import { getErrorMessage } from '../lib/errorUtils';
 
 export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
   const [formData, setFormData] = useState({
@@ -55,8 +56,7 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
         onSuccess();
       }, 2000);
     } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { message?: string } } };
-      setError(axiosError.response?.data?.message || 'Failed to upload item');
+      setError(getErrorMessage(err, 'Failed to upload item'));
     } finally {
       setUploading(false);
     }

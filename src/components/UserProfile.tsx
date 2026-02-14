@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { User, Mail, Shield, Calendar, Key, Save } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { getErrorMessage } from '../lib/errorUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
@@ -32,8 +33,7 @@ export default function UserProfile() {
 
       setMessage('Profile updated successfully!');
     } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { message?: string } } };
-      setError(axiosError.response?.data?.message || 'Failed to update profile');
+      setError(getErrorMessage(err, 'Failed to update profile'));
     } finally {
       setLoading(false);
     }
@@ -70,8 +70,7 @@ export default function UserProfile() {
       setNewPassword('');
       setConfirmPassword('');
     } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { message?: string } } };
-      setError(axiosError.response?.data?.message || 'Failed to change password');
+      setError(getErrorMessage(err, 'Failed to change password'));
     } finally {
       setLoading(false);
     }

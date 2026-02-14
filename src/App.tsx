@@ -13,6 +13,7 @@ import AdminUserManagement from './components/AdminUserManagement';
 import UserProfile from './components/UserProfile';
 import NotificationCenter from './components/NotificationCenter';
 import { paymentAPI } from './lib/api';
+import { getErrorMessage } from './lib/errorUtils';
 
 type View = 'home' | 'marketplace' | 'upload' | 'purchases' | 'dashboard' | 'payment-callback' | 'admin-dashboard' | 'admin-items' | 'admin-payouts' | 'admin-users' | 'profile';
 
@@ -47,8 +48,8 @@ function App() {
         await register(email, password, fullName, role);
         setSuccess('Registration successful!');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'An error occurred');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'An error occurred'));
     }
   };
 
@@ -57,7 +58,7 @@ function App() {
       await logout();
       setSuccess('Logged out successfully');
       setCurrentView('home');
-    } catch (err: any) {
+    } catch {
       setError('Logout failed');
     }
   };
@@ -67,8 +68,8 @@ function App() {
       const response = await paymentAPI.initializePayment(itemIds);
       const { authorization_url } = response.data.data;
       window.location.href = authorization_url;
-    } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to initialize payment');
+    } catch (error: unknown) {
+      alert(getErrorMessage(error, 'Failed to initialize payment'));
     }
   };
 
@@ -413,11 +414,6 @@ function App() {
               {isLogin ? 'Login' : 'Register'}
             </button>
           </form>
-
-          <div className="mt-6 text-center text-sm text-gray-600">
-            <p>Backend API: <span className="text-green-600 font-medium">Connected</span></p>
-            <p className="mt-1">Database: <span className="text-green-600 font-medium">Supabase</span></p>
-          </div>
         </div>
       </div>
     </div>

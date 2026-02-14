@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Download, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import { paymentAPI } from '../lib/api';
+import { getErrorMessage } from '../lib/errorUtils';
 
 interface Purchase {
   id: string;
@@ -88,10 +89,7 @@ export default function PurchaseHistory() {
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
       console.error('Failed to download file:', error);
-      const errorMessage = error && typeof error === 'object' && 'response' in error
-        ? (error.response as { data?: { message?: string } })?.data?.message
-        : undefined;
-      setError(errorMessage || 'Failed to download file. Please try again.');
+      setError(getErrorMessage(error, 'Failed to download file. Please try again.'));
       setTimeout(() => setError(null), 5000);
     } finally {
       setDownloading(null);

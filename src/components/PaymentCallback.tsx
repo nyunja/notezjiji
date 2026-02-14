@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 import { paymentAPI } from '../lib/api';
+import { getErrorMessage } from '../lib/errorUtils';
 
 interface PaymentCallbackProps {
   onComplete: () => void;
@@ -35,9 +36,8 @@ export default function PaymentCallback({ onComplete }: PaymentCallbackProps) {
           setMessage('Payment verification failed');
         }
       } catch (error: unknown) {
-        const axiosError = error as { response?: { data?: { message?: string } } };
         setStatus('failed');
-        setMessage(axiosError.response?.data?.message || 'Payment verification failed');
+        setMessage(getErrorMessage(error, 'Payment verification failed'));
       }
     };
 

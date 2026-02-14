@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Clock } from 'lucide-react';
 import axios from 'axios';
+import { getErrorMessage } from '../lib/errorUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
@@ -58,8 +59,7 @@ export default function AdminItemApproval() {
       setItems(items.filter(item => item.id !== itemId));
       alert('Item approved successfully');
     } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string } } };
-      alert(axiosError.response?.data?.message || 'Failed to approve item');
+      alert(getErrorMessage(error, 'Failed to approve item'));
     } finally {
       setProcessing(null);
     }
@@ -85,8 +85,7 @@ export default function AdminItemApproval() {
       setRejectionReason('');
       alert('Item rejected successfully');
     } catch (error: unknown) {
-      const axiosError = error as { response?: { data?: { message?: string } } };
-      alert(axiosError.response?.data?.message || 'Failed to reject item');
+      alert(getErrorMessage(error, 'Failed to reject item'));
     } finally {
       setProcessing(null);
     }
