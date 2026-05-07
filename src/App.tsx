@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
-import { LogIn, UserPlus, LogOut, Upload, ShoppingCart, FileText, DollarSign, Home, Shield, CheckSquare, Wallet, User as UserIcon, Users } from 'lucide-react';
+import { LogIn, UserPlus, Upload, BookOpen, ShoppingCart } from 'lucide-react';
 import Marketplace from './components/Marketplace';
 import UploadForm from './components/UploadForm';
 import PurchaseHistory from './components/PurchaseHistory';
@@ -11,14 +11,18 @@ import AdminItemApproval from './components/AdminItemApproval';
 import AdminPayoutApproval from './components/AdminPayoutApproval';
 import AdminUserManagement from './components/AdminUserManagement';
 import UserProfile from './components/UserProfile';
-import NotificationCenter from './components/NotificationCenter';
+import Sidebar from './components/Sidebar';
+import DashboardHeader from './components/DashboardHeader';
+import AnimatedPage from './components/AnimatedPage';
+import { AnimatePresence } from 'framer-motion';
 import { paymentAPI } from './lib/api';
+
 import { getErrorMessage } from './lib/errorUtils';
 
 type View = 'home' | 'marketplace' | 'upload' | 'purchases' | 'dashboard' | 'payment-callback' | 'admin-dashboard' | 'admin-items' | 'admin-payouts' | 'admin-users' | 'profile';
 
 function App() {
-  const { user, loading, login, register, logout } = useAuth();
+  const { user, loading, login, register } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,6 +31,7 @@ function App() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [currentView, setCurrentView] = useState<View>('home');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -44,22 +49,13 @@ function App() {
       if (isLogin) {
         await login(email, password);
         setSuccess('Login successful!');
+        setCurrentView('home');
       } else {
         await register(email, password, fullName, role);
         setSuccess('Registration successful!');
       }
     } catch (err: unknown) {
       setError(getErrorMessage(err, 'An error occurred'));
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setSuccess('Logged out successfully');
-      setCurrentView('home');
-    } catch {
-      setError('Logout failed');
     }
   };
 
@@ -75,250 +71,126 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 flex items-center justify-center">
-        <div className="text-xl text-gray-700">Loading...</div>
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0A0C10] flex items-center justify-center">
+        <div className="relative">
+          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100">
-        <nav className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16 items-center">
-              <div className="flex items-center space-x-2">
-                <Upload className="w-6 h-6 text-blue-600" />
-                <h1 className="text-xl font-bold text-gray-900">Academic Notes</h1>
-              </div>
-              <div className="flex items-center space-x-6">
-                <button
-                  onClick={() => setCurrentView('home')}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                    currentView === 'home'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <Home className="w-4 h-4" />
-                  <span>Home</span>
-                </button>
-                <button
-                  onClick={() => setCurrentView('marketplace')}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                    currentView === 'marketplace'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  <span>Marketplace</span>
-                </button>
-                {user.role === 'uploader' && (
-                  <>
-                    <button
-                      onClick={() => setCurrentView('upload')}
-                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                        currentView === 'upload'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <Upload className="w-4 h-4" />
-                      <span>Upload</span>
-                    </button>
-                    <button
-                      onClick={() => setCurrentView('dashboard')}
-                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                        currentView === 'dashboard'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <DollarSign className="w-4 h-4" />
-                      <span>Dashboard</span>
-                    </button>
-                  </>
-                )}
-                {user.role === 'admin' && (
-                  <>
-                    <button
-                      onClick={() => setCurrentView('admin-dashboard')}
-                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                        currentView === 'admin-dashboard'
-                          ? 'bg-red-100 text-red-700'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <Shield className="w-4 h-4" />
-                      <span>Admin</span>
-                    </button>
-                    <button
-                      onClick={() => setCurrentView('admin-items')}
-                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                        currentView === 'admin-items'
-                          ? 'bg-red-100 text-red-700'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <CheckSquare className="w-4 h-4" />
-                      <span>Items</span>
-                    </button>
-                    <button
-                      onClick={() => setCurrentView('admin-payouts')}
-                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                        currentView === 'admin-payouts'
-                          ? 'bg-red-100 text-red-700'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <Wallet className="w-4 h-4" />
-                      <span>Payouts</span>
-                    </button>
-                    <button
-                      onClick={() => setCurrentView('admin-users')}
-                      className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                        currentView === 'admin-users'
-                          ? 'bg-red-100 text-red-700'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <Users className="w-4 h-4" />
-                      <span>Users</span>
-                    </button>
-                  </>
-                )}
-                <button
-                  onClick={() => setCurrentView('purchases')}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition ${
-                    currentView === 'purchases'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>Purchases</span>
-                </button>
-                <div className="flex items-center space-x-3 border-l pl-4">
-                  <NotificationCenter />
-                  <button
-                    onClick={() => setCurrentView('profile')}
-                    className={`p-2 rounded-lg transition ${
-                      currentView === 'profile'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                    title="Profile"
-                  >
-                    <UserIcon className="w-5 h-5" />
-                  </button>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">{user.email}</span>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                      {user.role}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </nav>
+      <div className="min-h-screen flex bg-slate-50 dark:bg-[#0A0C10]">
+        <Sidebar 
+          currentView={currentView} 
+          setCurrentView={setCurrentView} 
+          isOpen={isSidebarOpen} 
+          setIsOpen={setIsSidebarOpen} 
+        />
+        
+        <div className={`flex-1 flex flex-col transition-all duration-500 ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
+          <DashboardHeader />
+          
+          <main className="p-8 overflow-y-auto max-h-[calc(100vh-80px)] no-scrollbar">
+            <AnimatePresence mode="wait">
+              <AnimatedPage key={currentView}>
+                {currentView === 'home' && (
+                  <div className="premium-card p-10 max-w-4xl mx-auto overflow-visible relative">
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-violet-500/10 rounded-full blur-3xl"></div>
+                    
+                    <h2 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+                      Welcome back, <span className="text-indigo-600 dark:text-indigo-400">{user.full_name}</span>!
+                    </h2>
+                    <p className="text-lg text-slate-600 dark:text-slate-400 mb-10 max-w-2xl">
+                      You're in the right place to level up your academics. Explore premium notes or share your own knowledge with the community.
+                    </p>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {currentView === 'home' && (
-            <div className="bg-white rounded-lg shadow-md p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome, {user.full_name}!</h2>
-              <p className="text-gray-600 mb-6">
-                You're logged in as a <strong>{user.role}</strong>. Explore the marketplace or manage your content.
-              </p>
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <button
+                        onClick={() => setCurrentView('marketplace')}
+                        className="group premium-card p-8 text-left hover:border-indigo-500/50 bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-900/40 dark:to-indigo-900/10"
+                      >
+                        <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                          <BookOpen className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">Explore Marketplace</h3>
+                        <p className="text-slate-600 dark:text-slate-400">Discover hand-crafted academic materials from top students.</p>
+                      </button>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <button
-                  onClick={() => setCurrentView('marketplace')}
-                  className="border border-gray-200 rounded-lg p-6 text-left hover:border-blue-300 hover:shadow-md transition"
-                >
-                  <div className="flex items-center space-x-2 mb-3">
-                    <ShoppingCart className="w-5 h-5 text-green-600" />
-                    <h3 className="font-semibold text-gray-900">Browse Marketplace</h3>
-                  </div>
-                  <p className="text-sm text-gray-600">Find and purchase quality academic materials</p>
-                </button>
-
-                {user.role === 'uploader' ? (
-                  <button
-                    onClick={() => setCurrentView('upload')}
-                    className="border border-gray-200 rounded-lg p-6 text-left hover:border-blue-300 hover:shadow-md transition"
-                  >
-                    <div className="flex items-center space-x-2 mb-3">
-                      <Upload className="w-5 h-5 text-blue-600" />
-                      <h3 className="font-semibold text-gray-900">Upload Notes</h3>
+                      {user.role === 'uploader' ? (
+                        <button
+                          onClick={() => setCurrentView('upload')}
+                          className="group premium-card p-8 text-left hover:border-violet-500/50 bg-gradient-to-br from-white to-violet-50/30 dark:from-slate-900/40 dark:to-violet-900/10"
+                        >
+                          <div className="w-14 h-14 bg-violet-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-violet-500/30 group-hover:scale-110 transition-transform">
+                            <Upload className="w-8 h-8 text-white" />
+                          </div>
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">Upload Your Work</h3>
+                          <p className="text-slate-600 dark:text-slate-400">Share your expertise and start earning from your notes.</p>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setCurrentView('purchases')}
+                          className="group premium-card p-8 text-left hover:border-emerald-500/50 bg-gradient-to-br from-white to-emerald-50/30 dark:from-slate-900/40 dark:to-emerald-900/10"
+                        >
+                          <div className="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                            <ShoppingCart className="w-8 h-8 text-white" />
+                          </div>
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">My Library</h3>
+                          <p className="text-slate-600 dark:text-slate-400">Access and manage all your purchased materials in one place.</p>
+                        </button>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-600">Share your academic notes with other students</p>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setCurrentView('purchases')}
-                    className="border border-gray-200 rounded-lg p-6 text-left hover:border-blue-300 hover:shadow-md transition"
-                  >
-                    <div className="flex items-center space-x-2 mb-3">
-                      <FileText className="w-5 h-5 text-sky-600" />
-                      <h3 className="font-semibold text-gray-900">My Purchases</h3>
-                    </div>
-                    <p className="text-sm text-gray-600">View and download your purchased materials</p>
-                  </button>
+                  </div>
                 )}
-              </div>
 
-              {success && (
-                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-                  {success}
-                </div>
-              )}
-            </div>
-          )}
+                {currentView === 'payment-callback' && (
+                  <PaymentCallback onComplete={() => setCurrentView('purchases')} />
+                )}
+                {currentView === 'marketplace' && <Marketplace onPurchase={handlePurchase} />}
+                {currentView === 'upload' && user.role === 'uploader' && (
+                  <UploadForm onSuccess={() => setCurrentView('dashboard')} />
+                )}
+                {currentView === 'purchases' && <PurchaseHistory />}
+                {currentView === 'dashboard' && user.role === 'uploader' && <UploaderDashboard />}
+                {currentView === 'admin-dashboard' && user.role === 'admin' && <AdminDashboard />}
+                {currentView === 'admin-items' && user.role === 'admin' && <AdminItemApproval />}
+                {currentView === 'admin-payouts' && user.role === 'admin' && <AdminPayoutApproval />}
+                {currentView === 'admin-users' && user.role === 'admin' && <AdminUserManagement />}
+                {currentView === 'profile' && <UserProfile />}
+              </AnimatedPage>
+            </AnimatePresence>
+          </main>
 
-          {currentView === 'payment-callback' && (
-            <PaymentCallback onComplete={() => setCurrentView('purchases')} />
-          )}
-          {currentView === 'marketplace' && <Marketplace onPurchase={handlePurchase} />}
-          {currentView === 'upload' && user.role === 'uploader' && (
-            <UploadForm onSuccess={() => setCurrentView('dashboard')} />
-          )}
-          {currentView === 'purchases' && <PurchaseHistory />}
-          {currentView === 'dashboard' && user.role === 'uploader' && <UploaderDashboard />}
-          {currentView === 'admin-dashboard' && user.role === 'admin' && <AdminDashboard />}
-          {currentView === 'admin-items' && user.role === 'admin' && <AdminItemApproval />}
-          {currentView === 'admin-payouts' && user.role === 'admin' && <AdminPayoutApproval />}
-          {currentView === 'admin-users' && user.role === 'admin' && <AdminUserManagement />}
-          {currentView === 'profile' && <UserProfile />}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-xl shadow-xl p-8">
-          <div className="flex items-center justify-center space-x-2 mb-6">
-            <Upload className="w-8 h-8 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Academic Notes</h1>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0C10] flex items-center justify-center p-4">
+      <div className="max-w-md w-full animate-slide-up">
+        <div className="glass rounded-[2rem] shadow-2xl p-10 border-white/40">
+          <div className="flex flex-col items-center justify-center mb-10">
+            <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/20">
+              <BookOpen className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Notezjiji</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Empowering your academic journey</p>
           </div>
 
-          <div className="flex space-x-2 mb-6">
+          <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-2xl mb-8">
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+              className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${
                 isLogin
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
               }`}
             >
               <LogIn className="w-4 h-4 inline mr-2" />
@@ -326,10 +198,10 @@ function App() {
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+              className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${
                 !isLogin
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
               }`}
             >
               <UserPlus className="w-4 h-4 inline mr-2" />
@@ -337,81 +209,84 @@ function App() {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
                   Full Name
                 </label>
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="John Doe"
+                  className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white"
                   required={!isLogin}
                 />
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+            <div className="space-y-1.5">
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
+                Email Address
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="hello@example.com"
+                className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white"
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="space-y-1.5">
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
                 Password
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="••••••••"
+                className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white"
                 required
               />
             </div>
 
             {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
+                  I want to...
                 </label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white appearance-none"
                 >
-                  <option value="buyer">Buyer</option>
-                  <option value="uploader">Uploader</option>
+                  <option value="buyer">Buy Notes</option>
+                  <option value="uploader">Upload & Earn</option>
                 </select>
               </div>
             )}
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl text-rose-600 dark:text-rose-400 text-sm font-medium animate-shake">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+              <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl text-emerald-600 dark:text-emerald-400 text-sm font-medium">
                 {success}
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+              className="btn-premium w-full py-4 text-lg"
             >
-              {isLogin ? 'Login' : 'Register'}
+              {isLogin ? 'Sign In' : 'Create Account'}
             </button>
           </form>
         </div>
