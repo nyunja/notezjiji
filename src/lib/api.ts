@@ -78,7 +78,9 @@ export const itemsAPI = {
     api.get('/items/my-items'),
   getItemStats: () =>
     api.get('/items/stats'),
-  createItem: (data: FormData) =>
+  getUploaderStats: () =>
+    api.get('/items/uploader-stats'),
+  uploadItem: (data: FormData) =>
     api.post('/items', data, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
@@ -87,6 +89,7 @@ export const itemsAPI = {
   deleteItem: (id: string) =>
     api.delete(`/items/${id}`)
 };
+
 
 export const paymentAPI = {
   initializePayment: (itemIds: string[]) =>
@@ -100,5 +103,23 @@ export const paymentAPI = {
   getUploaderEarnings: () =>
     api.get('/payments/earnings')
 };
+
+export const adminAPI = {
+  getStats: () =>
+    api.get('/admin/stats'),
+  getItems: (params?: unknown) =>
+    api.get('/admin/items', { params }),
+  updateItemStatus: (id: string, status: string) =>
+    api.put(`/admin/items/${id}/status`, { status }),
+  getPayouts: () =>
+    api.get('/admin/payouts'),
+  approvePayout: (id: string) =>
+    api.post(`/admin/payouts/${id}/approve`),
+  getUsers: () =>
+    api.get('/admin/users'),
+  updateUserRole: (id: string, role: string) =>
+    api.put(`/admin/users/${id}/role`, { role })
+};
+
 
 export default api;
