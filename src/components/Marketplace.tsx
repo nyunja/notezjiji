@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Search } from 'lucide-react';
+import { ShoppingCart, Search, Filter, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
 import { itemsAPI } from '../lib/api';
+import NotezCard from './NotezCard';
 
 interface Item {
   id: string;
@@ -27,6 +28,7 @@ export default function Marketplace({ onPurchase }: { onPurchase: (itemIds: stri
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [cart, setCart] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     loadItems();
@@ -44,7 +46,6 @@ export default function Marketplace({ onPurchase }: { onPurchase: (itemIds: stri
 
       let filteredItems = response.data.data.items || [];
 
-      // Client-side price filtering
       if (minPrice) {
         filteredItems = filteredItems.filter((item: Item) => item.price >= parseFloat(minPrice));
       }
@@ -74,173 +75,183 @@ export default function Marketplace({ onPurchase }: { onPurchase: (itemIds: stri
     }
   };
 
-  const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  const clearFilters = () => {
+    setSelectedCourse('');
+    setSelectedYear('');
+    setMinPrice('');
+    setMaxPrice('');
+    setSearch('');
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="text-gray-600">Loading marketplace...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Browse Academic Notes</h2>
+    <div className="space-y-8 pb-20">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h2 className="text-4xl font-black text-slate-900 dark:text-slate-100 mb-2">Marketplace</h2>
+          <p className="text-slate-500 dark:text-slate-400">Discover premium academic materials to excel in your studies.</p>
+        </div>
+        
         {cart.length > 0 && (
           <button
             onClick={handleCheckout}
-            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            className="group relative flex items-center space-x-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-xl shadow-indigo-500/30 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all"
           >
-            <ShoppingCart className="w-4 h-4" />
-            <span>Checkout ({cart.length})</span>
+            <ShoppingCart className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+            <span>Checkout {cart.length} Items</span>
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white dark:border-slate-900">
+              {cart.length}
+            </div>
           </button>
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
-        <div className="grid md:grid-cols-4 gap-4">
-          <div className="relative md:col-span-2">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search notes..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <select
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">All Courses</option>
-            <option value="mathematics">Mathematics</option>
-            <option value="physics">Physics</option>
-            <option value="chemistry">Chemistry</option>
-            <option value="biology">Biology</option>
-            <option value="computer-science">Computer Science</option>
-            <option value="engineering">Engineering</option>
-          </select>
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">All Years</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
-            <option value="2022">2022</option>
-            <option value="2021">2021</option>
-          </select>
+      {/* Toolbar */}
+      <div className="flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 group w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+          <input
+            type="text"
+            placeholder="Search by title, topic, or course..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm"
+          />
         </div>
+        
+        <button 
+          onClick={() => setShowFilters(!showFilters)}
+          className={`
+            flex items-center space-x-2 px-6 py-4 rounded-2xl font-bold transition-all w-full md:w-auto
+            ${showFilters 
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' 
+              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50'
+            }
+          `}
+        >
+          <SlidersHorizontal className="w-5 h-5" />
+          <span>Filters</span>
+        </button>
 
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">Sort:</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="popular">Most Popular</option>
-            </select>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">Price Range:</label>
-            <input
-              type="number"
-              placeholder="Min"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <span className="text-gray-500">-</span>
-            <input
-              type="number"
-              placeholder="Max"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          {(minPrice || maxPrice) && (
-            <button
-              onClick={() => {
-                setMinPrice('');
-                setMaxPrice('');
-              }}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Clear
-            </button>
-          )}
+        <div className="relative w-full md:w-auto">
+          <ArrowUpDown className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full md:w-auto pl-10 pr-10 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-slate-600 dark:text-slate-400 outline-none hover:border-indigo-500/50 appearance-none shadow-sm cursor-pointer"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="popular">Most Popular</option>
+          </select>
         </div>
       </div>
 
-      {items.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-          <p className="text-gray-600">No items found matching your criteria</p>
+      {/* Expanded Filters */}
+      {showFilters && (
+        <div className="premium-card p-6 grid md:grid-cols-4 gap-6 animate-slide-up">
+          <div className="space-y-2">
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Course</label>
+            <select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all font-bold text-slate-700 dark:text-slate-200"
+            >
+              <option value="">All Courses</option>
+              <option value="mathematics">Mathematics</option>
+              <option value="physics">Physics</option>
+              <option value="chemistry">Chemistry</option>
+              <option value="biology">Biology</option>
+              <option value="computer-science">Computer Science</option>
+              <option value="engineering">Engineering</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Year</label>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all font-bold text-slate-700 dark:text-slate-200"
+            >
+              <option value="">All Years</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+            </select>
+          </div>
+
+          <div className="space-y-2 md:col-span-1">
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Price Range (₦)</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                placeholder="Min"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all font-bold text-slate-700 dark:text-slate-200"
+              />
+              <span className="text-slate-400">to</span>
+              <input
+                type="number"
+                placeholder="Max"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all font-bold text-slate-700 dark:text-slate-200"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-end gap-3">
+            <button 
+              onClick={clearFilters}
+              className="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+            >
+              Reset
+            </button>
+            <button 
+              onClick={() => setShowFilters(false)}
+              className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Content Grid */}
+      {loading ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="premium-card h-96 animate-pulse bg-slate-200 dark:bg-slate-800/50"></div>
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+            <Filter className="w-10 h-10 text-slate-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">No matching Notez</h3>
+          <p className="text-slate-500 dark:text-slate-400 max-w-sm">We couldn't find any materials matching your filters. Try broadening your search!</p>
+          <button 
+            onClick={clearFilters}
+            className="mt-6 text-indigo-600 dark:text-indigo-400 font-black hover:underline"
+          >
+            Clear all filters
+          </button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {items.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition p-6"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-                  <p className="text-sm text-gray-600">{item.course} - {item.year}</p>
-                </div>
-                <span className="text-lg font-bold text-green-600">
-                  {formatPrice(item.price)}
-                </span>
-              </div>
-
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                {item.tags.slice(0, 3).map((tag, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                <span>By {item.uploader?.full_name || 'Anonymous'}</span>
-                <span>{formatFileSize(item.file_size)}</span>
-              </div>
-
-              <button
-                onClick={() => toggleCart(item.id)}
-                className={`w-full py-2 px-4 rounded-lg font-medium transition ${
-                  cart.includes(item.id)
-                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                {cart.includes(item.id) ? 'Remove from Cart' : 'Add to Cart'}
-              </button>
-            </div>
+            <NotezCard 
+              key={item.id} 
+              item={item} 
+              isInCart={cart.includes(item.id)}
+              onToggleCart={toggleCart}
+            />
           ))}
         </div>
       )}
