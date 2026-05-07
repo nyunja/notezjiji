@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Users, FileText, DollarSign, TrendingUp, CheckCircle, XCircle, Clock } from 'lucide-react';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
+import { Users, FileText, DollarSign, TrendingUp, CheckCircle, XCircle, Clock, Shield, ArrowRight } from 'lucide-react';
+import { adminAPI } from '../lib/api';
 
 interface Stats {
   users: {
@@ -38,158 +36,147 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get(`${API_URL}/admin/stats`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await adminAPI.getStats();
       setStats(response.data.data);
     } catch (error) {
+
       console.error('Failed to load stats:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  const StatCard = ({ label, value, icon: Icon, color, subtext }: any) => (
+    <div className="premium-card p-6 relative overflow-visible">
+      <div className={`absolute -top-3 -right-3 w-12 h-12 rounded-2xl bg-${color}-500/10 dark:bg-${color}-500/20 flex items-center justify-center text-${color}-600 dark:text-${color}-400 shadow-lg shadow-${color}-500/10`}>
+        <Icon className="w-6 h-6" />
+      </div>
+      <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+      <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100">{value}</h3>
+      {subtext && <p className="text-xs font-bold text-slate-500 mt-2">{subtext}</p>}
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="text-gray-600">Loading dashboard...</div>
+      <div className="space-y-8 animate-pulse">
+        <div className="h-12 w-64 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>)}
+        </div>
       </div>
     );
   }
 
-  if (!stats) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-        Failed to load dashboard stats
-      </div>
-    );
-  }
+  if (!stats) return null;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
-        <p className="text-gray-600 mt-1">Overview of platform activity</p>
+    <div className="space-y-10">
+      <div className="flex items-center space-x-4">
+        <div className="w-12 h-12 bg-rose-600 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-500/20">
+          <Shield className="w-7 h-7 text-white" />
+        </div>
+        <div>
+          <h2 className="text-4xl font-black text-slate-900 dark:text-slate-100 mb-1">Command Center</h2>
+          <p className="text-slate-500 dark:text-slate-400">Platform-wide overview and administrative controls.</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.users.total}</p>
-              <div className="flex items-center space-x-4 mt-3 text-sm text-gray-500">
-                <span>{stats.users.buyers} buyers</span>
-                <span>•</span>
-                <span>{stats.users.uploaders} uploaders</span>
-              </div>
-            </div>
-            <Users className="w-12 h-12 text-blue-500" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Items</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.items.total}</p>
-              <div className="flex items-center space-x-2 mt-3">
-                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">
-                  {stats.items.pending} pending
-                </span>
-                <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
-                  {stats.items.approved} approved
-                </span>
-              </div>
-            </div>
-            <FileText className="w-12 h-12 text-green-500" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
-                ₦{stats.revenue.total.toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500 mt-3">
-                {stats.revenue.transactions} transactions
-              </p>
-            </div>
-            <TrendingUp className="w-12 h-12 text-purple-500" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Payouts</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
-                ₦{stats.payouts.totalPaid.toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500 mt-3">
-                {stats.payouts.pending} pending approval
-              </p>
-            </div>
-            <DollarSign className="w-12 h-12 text-orange-500" />
-          </div>
-        </div>
+        <StatCard 
+          label="Total Users" 
+          value={stats.users.total} 
+          icon={Users} 
+          color="indigo"
+          subtext={`${stats.users.uploaders} Uploaders • ${stats.users.buyers} Buyers`}
+        />
+        <StatCard 
+          label="Items" 
+          value={stats.items.total} 
+          icon={FileText} 
+          color="emerald"
+          subtext={`${stats.items.pending} Awaiting Review`}
+        />
+        <StatCard 
+          label="Revenue" 
+          value={`₦${stats.revenue.total.toLocaleString()}`} 
+          icon={TrendingUp} 
+          color="violet"
+          subtext={`${stats.revenue.transactions} Transactions`}
+        />
+        <StatCard 
+          label="Paid Out" 
+          value={`₦${stats.payouts.totalPaid.toLocaleString()}`} 
+          icon={DollarSign} 
+          color="rose"
+          subtext={`${stats.payouts.pending} Pending Payouts`}
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Item Status</h3>
-          <div className="space-y-4">
+      <div className="grid lg:grid-cols-2 gap-8">
+        <div className="premium-card p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Item Status Breakdown</h3>
+            <CheckCircle className="w-5 h-5 text-emerald-500" />
+          </div>
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Clock className="w-5 h-5 text-yellow-600" />
-                <span className="text-gray-700">Pending Approval</span>
+              <div className="flex items-center space-x-3 text-slate-600 dark:text-slate-400">
+                <Clock className="w-5 h-5" />
+                <span className="font-bold">Pending Review</span>
               </div>
-              <span className="font-bold text-gray-900">{stats.items.pending}</span>
+              <span className="text-xl font-black text-amber-500">{stats.items.pending}</span>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-gray-700">Approved</span>
+              <div className="flex items-center space-x-3 text-slate-600 dark:text-slate-400">
+                <CheckCircle className="w-5 h-5" />
+                <span className="font-bold">Approved Notez</span>
               </div>
-              <span className="font-bold text-gray-900">{stats.items.approved}</span>
+              <span className="text-xl font-black text-emerald-500">{stats.items.approved}</span>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <XCircle className="w-5 h-5 text-red-600" />
-                <span className="text-gray-700">Rejected</span>
+              <div className="flex items-center space-x-3 text-slate-600 dark:text-slate-400">
+                <XCircle className="w-5 h-5" />
+                <span className="font-bold">Rejected Content</span>
               </div>
-              <span className="font-bold text-gray-900">{stats.items.rejected}</span>
+              <span className="text-xl font-black text-rose-500">{stats.items.rejected}</span>
             </div>
           </div>
+          <button className="w-full mt-10 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center space-x-2">
+            <span>Manage All Items</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Health</h3>
-          <div className="space-y-4">
+        <div className="premium-card p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Platform Health</h3>
+            <TrendingUp className="w-5 h-5 text-indigo-500" />
+          </div>
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Active Users</span>
-              <span className="font-bold text-gray-900">{stats.users.buyers + stats.users.uploaders}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-700">Approval Rate</span>
-              <span className="font-bold text-gray-900">
-                {stats.items.total > 0
-                  ? Math.round((stats.items.approved / stats.items.total) * 100)
-                  : 0}%
+              <span className="text-slate-600 dark:text-slate-400 font-bold">Content Approval Rate</span>
+              <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                {stats.items.total > 0 ? Math.round((stats.items.approved / stats.items.total) * 100) : 0}%
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Avg Transaction</span>
-              <span className="font-bold text-gray-900">
-                ₦{stats.revenue.transactions > 0
-                  ? Math.round(stats.revenue.total / stats.revenue.transactions).toLocaleString()
-                  : 0}
+              <span className="text-slate-600 dark:text-slate-400 font-bold">Average Order Value</span>
+              <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                ₦{stats.revenue.transactions > 0 ? Math.round(stats.revenue.total / stats.revenue.transactions).toLocaleString() : 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-slate-600 dark:text-slate-400 font-bold">Creator Participation</span>
+              <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                {stats.users.total > 0 ? Math.round((stats.users.uploaders / stats.users.total) * 100) : 0}%
               </span>
             </div>
           </div>
+          <button className="w-full mt-10 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center space-x-2">
+            <span>Download Full Audit</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>
