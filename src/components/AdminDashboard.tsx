@@ -47,7 +47,7 @@ export default function AdminDashboard() {
   };
 
   const StatCard = ({ label, value, icon: Icon, color, subtext }: any) => (
-    <div className="premium-card p-6 relative overflow-visible">
+    <div className="premium-card-static p-6 relative overflow-visible">
       <div className={`absolute -top-3 -right-3 w-12 h-12 rounded-2xl bg-${color}-500/10 dark:bg-${color}-500/20 flex items-center justify-center text-${color}-600 dark:text-${color}-400 shadow-lg shadow-${color}-500/10`}>
         <Icon className="w-6 h-6" />
       </div>
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
-        <div className="premium-card p-8">
+        <div className="premium-card-static p-8">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Item Status Breakdown</h3>
             <CheckCircle className="w-5 h-5 text-emerald-500" />
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <div className="premium-card p-8">
+        <div className="premium-card-static p-8">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Platform Health</h3>
             <TrendingUp className="w-5 h-5 text-indigo-500" />

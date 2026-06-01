@@ -11,6 +11,7 @@ if (!process.env.UPSTASH_REDIS_URL) {
 export const redis = new Redis(process.env.UPSTASH_REDIS_URL, {
   maxRetriesPerRequest: null, // Required for BullMQ compatibility
   enableReadyCheck: false,
+  enableOfflineQueue: false,
   retryStrategy(times) {
     const delay = Math.min(times * 50, 2000);
     return delay;
@@ -29,6 +30,9 @@ export class CacheService {
   private readonly defaultTTL = 300;
 
   async get<T>(key: string): Promise<T | null> {
+    if (redis.status !== 'ready') {
+      return null;
+    }
     try {
       const data = await redis.get(key);
       return data ? JSON.parse(data) : null;
@@ -39,6 +43,9 @@ export class CacheService {
   }
 
   async set(key: string, value: unknown, ttl: number = this.defaultTTL): Promise<void> {
+    if (redis.status !== 'ready') {
+      return;
+    }
     try {
       await redis.setex(key, ttl, JSON.stringify(value));
     } catch (error) {
@@ -47,6 +54,9 @@ export class CacheService {
   }
 
   async delete(key: string): Promise<void> {
+    if (redis.status !== 'ready') {
+      return;
+    }
     try {
       await redis.del(key);
     } catch (error) {
@@ -55,6 +65,9 @@ export class CacheService {
   }
 
   async deletePattern(pattern: string): Promise<void> {
+    if (redis.status !== 'ready') {
+      return;
+    }
     try {
       const keys = await redis.keys(pattern);
       if (keys.length > 0) {
@@ -66,6 +79,9 @@ export class CacheService {
   }
 
   async increment(key: string, ttl?: number): Promise<number> {
+    if (redis.status !== 'ready') {
+      return 0;
+    }
     try {
       const value = await redis.incr(key);
       if (ttl) {

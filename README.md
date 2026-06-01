@@ -276,6 +276,15 @@ Key tables:
 
 This project is private and proprietary.
 
+## Recent Reliability & Stability Improvements
+
+### Frontend Layout Stability
+* **No-Hover Static Cards**: Introduced `.premium-card-static` class to support stationary display containers. This prevents double hover animations and jitter when elements inside cards are hovered.
+* **Scrollbar Stabilization**: Configured custom scrollbar styles and `.no-scrollbar` behavior inside `index.css` to hide scrollbars as intended and prevent layout shifts.
+
+### Backend Fail-safes
+* **Graceful Redis Bypassing**: Configured Redis connections to fail fast and disable offline command queuing (`enableOfflineQueue: false`). The `CacheService` detects if Redis is unavailable and bypasses the cache immediately to query Supabase directly, preventing endpoint hangs.
+
 ## Support
 
 For issues and questions, please open an issue in the repository.

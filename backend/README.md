@@ -142,6 +142,10 @@ npm run typecheck  # Type check without building
 7. Configure Redis persistence
 8. Set up database backups
 
+## Offline Redis Fail-safe
+
+* **Graceful Redis Fallback**: The backend is configured to fail fast and bypass caching when Redis is disconnected or offline (`enableOfflineQueue: false` is set). All operations in `CacheService` immediately fallback to direct database queries to prevent the application from hanging.
+
 ## License
 
 MIT

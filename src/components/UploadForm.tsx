@@ -84,7 +84,7 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
       <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {/* Main Info */}
-          <div className="premium-card p-8 space-y-6">
+          <div className="premium-card-static p-8 space-y-6">
             <div className="flex items-center space-x-2 text-indigo-600 dark:text-indigo-400 mb-2">
               <FileText className="w-5 h-5" />
               <h3 className="font-black uppercase tracking-widest text-sm">Note Details</h3>
@@ -118,7 +118,7 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
           </div>
 
           {/* File Upload */}
-          <div className="premium-card p-8">
+          <div className="premium-card-static p-8">
             <div className="flex items-center space-x-2 text-indigo-600 dark:text-indigo-400 mb-6">
               <Upload className="w-5 h-5" />
               <h3 className="font-black uppercase tracking-widest text-sm">Document Source</h3>
@@ -163,7 +163,7 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
 
         {/* Sidebar Info */}
         <div className="space-y-8">
-          <div className="premium-card p-8 space-y-6">
+          <div className="premium-card-static p-8 space-y-6">
             <div className="flex items-center space-x-2 text-indigo-600 dark:text-indigo-400 mb-2">
               <DollarSign className="w-5 h-5" />
               <h3 className="font-black uppercase tracking-widest text-sm">Pricing & Course</h3>
@@ -217,7 +217,7 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
             </div>
           </div>
 
-          <div className="premium-card p-8 space-y-6">
+          <div className="premium-card-static p-8 space-y-6">
             <div className="flex items-center space-x-2 text-indigo-600 dark:text-indigo-400 mb-2">
               <Tag className="w-5 h-5" />
               <h3 className="font-black uppercase tracking-widest text-sm">Tags</h3>

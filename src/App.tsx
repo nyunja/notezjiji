@@ -99,7 +99,7 @@ function App() {
             <AnimatePresence mode="wait">
               <AnimatedPage key={currentView}>
                 {currentView === 'home' && (
-                  <div className="premium-card p-10 max-w-4xl mx-auto overflow-visible relative">
+                  <div className="premium-card-static p-10 max-w-4xl mx-auto overflow-visible relative">
                     <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
                     <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-violet-500/10 rounded-full blur-3xl"></div>
                     

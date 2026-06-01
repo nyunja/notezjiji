@@ -40,7 +40,7 @@ export default function UploaderDashboard() {
   const formatCurrency = (amount: number) => `₦${amount.toLocaleString()}`;
 
   const StatCard = ({ label, value, icon: Icon, color, trend }: any) => (
-    <div className="premium-card p-6 overflow-visible relative">
+    <div className="premium-card-static p-6 overflow-visible relative">
       <div className={`absolute -top-3 -right-3 w-12 h-12 rounded-2xl bg-${color}-500/10 dark:bg-${color}-500/20 flex items-center justify-center text-${color}-600 dark:text-${color}-400 shadow-lg shadow-${color}-500/10`}>
         <Icon className="w-6 h-6" />
       </div>
@@ -113,7 +113,7 @@ export default function UploaderDashboard() {
             </button>
           </div>
           
-          <div className="premium-card p-8 h-64 flex items-center justify-center border-dashed border-2">
+          <div className="premium-card-static p-8 h-64 flex items-center justify-center border-dashed border-2">
             <div className="text-center">
               <TrendingUp className="w-12 h-12 text-slate-200 dark:text-slate-800 mx-auto mb-4" />
               <p className="text-slate-400 font-bold">Analytics charts will appear here as your notes gain traction.</p>
@@ -130,7 +130,7 @@ export default function UploaderDashboard() {
               { title: 'Add Tags', desc: 'Items with 5+ relevant tags sell 40% faster.', icon: TrendingUp, color: 'emerald' },
               { title: 'Quality Matters', desc: 'High-resolution PDFs are preferred by buyers.', icon: CheckCircle2, color: 'violet' }
             ].map((tip, i) => (
-              <div key={i} className="premium-card p-4 flex items-start space-x-4 hover:border-slate-300 dark:hover:border-slate-700">
+              <div key={i} className="premium-card-static p-4 flex items-start space-x-4 hover:border-slate-300 dark:hover:border-slate-700">
                 <div className={`p-2 rounded-lg bg-${tip.color}-500/10 text-${tip.color}-600 dark:text-${tip.color}-400`}>
                   <tip.icon className="w-5 h-5" />
                 </div>
