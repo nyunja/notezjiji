@@ -144,7 +144,7 @@ export class EmailService {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #10b981;">Payout Approved!</h2>
         <p>Hi ${uploaderName},</p>
-        <p>Good news! Your payout request for <strong>₦${amount.toLocaleString()}</strong> has been approved.</p>
+        <p>Good news! Your payout request for <strong>Ksh ${amount.toLocaleString()}</strong> has been approved.</p>
         <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 16px; margin: 20px 0;">
           <p style="margin: 0; color: #065f46;">
             <strong>Processing Details:</strong><br>
@@ -156,7 +156,7 @@ export class EmailService {
         </p>
       </div>
     `;
-    const text = `Hi ${uploaderName}, Your payout request for ₦${amount.toLocaleString()} has been approved. Funds will arrive within 2-3 business days.`;
+    const text = `Hi ${uploaderName}, Your payout request for Ksh ${amount.toLocaleString()} has been approved. Funds will arrive within 2-3 business days.`;
 
     return this.sendEmail({
       to: uploaderEmail,
@@ -172,7 +172,7 @@ export class EmailService {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #ef4444;">Payout Request Update</h2>
         <p>Hi ${uploaderName},</p>
-        <p>Your payout request for <strong>₦${amount.toLocaleString()}</strong> was not approved.</p>
+        <p>Your payout request for <strong>Ksh ${amount.toLocaleString()}</strong> was not approved.</p>
         <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; margin: 20px 0;">
           <p style="margin: 0; color: #991b1b;">
             <strong>Reason:</strong><br>
@@ -185,7 +185,7 @@ export class EmailService {
         </p>
       </div>
     `;
-    const text = `Hi ${uploaderName}, Your payout request for ₦${amount.toLocaleString()} was rejected. Reason: ${reason}`;
+    const text = `Hi ${uploaderName}, Your payout request for Ksh ${amount.toLocaleString()} was rejected. Reason: ${reason}`;
 
     return this.sendEmail({
       to: uploaderEmail,
@@ -206,7 +206,7 @@ export class EmailService {
           <p style="margin: 0; color: #1e40af;">
             <strong>Order Details:</strong><br>
             Item: ${itemTitle}<br>
-            Amount: ₦${amount.toLocaleString()}
+            Amount: Ksh ${amount.toLocaleString()}
           </p>
         </div>
         <p>You can download your file from the "Purchases" section in your dashboard.</p>
@@ -215,7 +215,7 @@ export class EmailService {
         </p>
       </div>
     `;
-    const text = `Hi ${buyerName}, Your purchase of "${itemTitle}" for ₦${amount.toLocaleString()} is confirmed. Download it from your dashboard.`;
+    const text = `Hi ${buyerName}, Your purchase of "${itemTitle}" for Ksh ${amount.toLocaleString()} is confirmed. Download it from your dashboard.`;
 
     return this.sendEmail({
       to: buyerEmail,

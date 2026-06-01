@@ -171,16 +171,16 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Price (₦)</label>
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Price (Ksh)</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-400">₦</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-400 text-xs">Ksh</span>
                   <input
                     type="number"
                     required
                     placeholder="500"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full pl-8 pr-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white font-black"
+                    className="w-full pl-12 pr-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white font-black"
                   />
                 </div>
               </div>

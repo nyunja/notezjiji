@@ -119,7 +119,7 @@ export default function AdminPayoutApproval() {
                   <div className="flex items-center space-x-3 mb-2">
                     <DollarSign className="w-6 h-6 text-green-600" />
                     <h3 className="text-2xl font-bold text-gray-900">
-                      ₦{Number(payout.amount).toLocaleString()}
+                      Ksh {Number(payout.amount).toLocaleString()}
                     </h3>
                   </div>
 

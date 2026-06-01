@@ -23,7 +23,7 @@ interface ItemPreviewModalProps {
 }
 
 export default function ItemPreviewModal({ item, onClose, onAddToCart, onPurchase }: ItemPreviewModalProps) {
-  const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
+  const formatPrice = (price: number) => `Ksh ${price.toLocaleString()}`;
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';

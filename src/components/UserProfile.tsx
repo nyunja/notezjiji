@@ -242,7 +242,7 @@ export default function UserProfile() {
             <p className="text-sm text-gray-600">Items Uploaded</p>
           </div>
           <div className="text-center p-4 bg-orange-50 rounded-lg">
-            <p className="text-2xl font-bold text-orange-600">₦0</p>
+            <p className="text-2xl font-bold text-orange-600">Ksh 0</p>
             <p className="text-sm text-gray-600">Total Spent</p>
           </div>
         </div>

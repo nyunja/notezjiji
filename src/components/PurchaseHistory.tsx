@@ -190,7 +190,7 @@ export default function PurchaseHistory() {
                     {purchase.item.course} • {purchase.item.year}
                   </p>
                   <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span className="font-medium text-gray-700">₦{Number(purchase.amount).toLocaleString()}</span>
+                    <span className="font-medium text-gray-700">Ksh {Number(purchase.amount).toLocaleString()}</span>
                     <span>•</span>
                     <span>
                       Downloads: {purchase.download_count}/{purchase.max_downloads}

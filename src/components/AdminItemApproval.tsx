@@ -138,7 +138,7 @@ export default function AdminItemApproval() {
                   </div>
                 </div>
                 <div className="text-right ml-6">
-                  <p className="text-2xl font-bold text-gray-900">₦{Number(item.price).toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-gray-900">Ksh {Number(item.price).toLocaleString()}</p>
                 </div>
               </div>
 

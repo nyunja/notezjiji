@@ -185,7 +185,7 @@ export default function Marketplace({ onPurchase }: { onPurchase: (itemIds: stri
           </div>
 
           <div className="space-y-2 md:col-span-1">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Price Range (₦)</label>
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Price Range (Ksh)</label>
             <div className="flex items-center space-x-2">
               <input
                 type="number"

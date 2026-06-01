@@ -99,14 +99,14 @@ export default function AdminDashboard() {
         />
         <StatCard 
           label="Revenue" 
-          value={`₦${stats.revenue.total.toLocaleString()}`} 
+          value={`Ksh ${stats.revenue.total.toLocaleString()}`} 
           icon={TrendingUp} 
           color="violet"
           subtext={`${stats.revenue.transactions} Transactions`}
         />
         <StatCard 
           label="Paid Out" 
-          value={`₦${stats.payouts.totalPaid.toLocaleString()}`} 
+          value={`Ksh ${stats.payouts.totalPaid.toLocaleString()}`} 
           icon={DollarSign} 
           color="rose"
           subtext={`${stats.payouts.pending} Pending Payouts`}
@@ -163,7 +163,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <span className="text-slate-600 dark:text-slate-400 font-bold">Average Order Value</span>
               <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
-                ₦{stats.revenue.transactions > 0 ? Math.round(stats.revenue.total / stats.revenue.transactions).toLocaleString() : 0}
+                Ksh {stats.revenue.transactions > 0 ? Math.round(stats.revenue.total / stats.revenue.transactions).toLocaleString() : 0}
               </span>
             </div>
             <div className="flex items-center justify-between">

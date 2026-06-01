@@ -37,7 +37,7 @@ export default function UploaderDashboard() {
     }
   };
 
-  const formatCurrency = (amount: number) => `₦${amount.toLocaleString()}`;
+  const formatCurrency = (amount: number) => `Ksh ${amount.toLocaleString()}`;
 
   const StatCard = ({ label, value, icon: Icon, color, trend }: any) => (
     <div className="premium-card-static p-6 overflow-visible relative">

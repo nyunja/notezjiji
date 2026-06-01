@@ -79,6 +79,7 @@ export class PaymentService {
       body: JSON.stringify({
         email: userEmail,
         amount: Math.round(totalAmount * 100),
+        currency: 'KES',
         reference,
         metadata: {
           userId,
