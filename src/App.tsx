@@ -173,122 +173,164 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0C10] flex items-center justify-center p-4">
-      <div className="max-w-md w-full animate-slide-up">
-        <div className="glass rounded-[2rem] shadow-2xl p-10 border-white/40">
-          <div className="flex flex-col items-center justify-center mb-10">
-            <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/20">
-              <BookOpen className="w-10 h-10 text-white" />
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0C10] flex flex-col md:flex-row">
+      {/* Left side: Premium Image Banner */}
+      <div className="hidden md:block md:w-1/2 relative h-screen overflow-hidden">
+        <img 
+          src="/auth_sidebar.png" 
+          alt="Branding" 
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-slate-950/40 to-transparent z-10" />
+        <div className="absolute inset-0 flex flex-col justify-between p-16 text-white z-20">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-lg">
+              <BookOpen className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Notezjiji</h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1">Empowering your academic journey</p>
+            <span className="text-2xl font-black tracking-wider uppercase font-outfit bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-indigo-200">
+              Notezjiji
+            </span>
           </div>
-
-          <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-2xl mb-8">
-            <button
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${
-                isLogin
-                  ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
-              }`}
-            >
-              <LogIn className="w-4 h-4 inline mr-2" />
-              Login
-            </button>
-            <button
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${
-                !isLogin
-                  ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
-              }`}
-            >
-              <UserPlus className="w-4 h-4 inline mr-2" />
-              Register
-            </button>
+          <div className="space-y-6">
+            <h2 className="text-5xl font-black font-outfit leading-[1.15] tracking-tight">
+              Empowering your <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400">academic journey</span>
+            </h2>
+            <p className="text-slate-300 max-w-lg font-medium text-lg leading-relaxed">
+              Join thousands of students who are sharing, purchasing, and monetizing high-quality academic notes to excel together.
+            </p>
           </div>
+        </div>
+      </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && (
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
-                  Full Name
+      {/* Right side: Login / Register Form */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-16 h-screen overflow-y-auto no-scrollbar">
+        <div className="max-w-md w-full animate-slide-up">
+          <div className="glass rounded-[2rem] shadow-2xl p-10 border-white/40 dark:border-slate-800/40 relative overflow-hidden">
+            <div className="absolute -top-12 -right-12 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl"></div>
+            
+            <div className="flex flex-col items-center justify-center mb-8">
+              <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/30 md:hidden">
+                <BookOpen className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+                {isLogin ? 'Welcome Back' : 'Create Account'}
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm text-center">
+                {isLogin 
+                  ? 'Access your marketplace account' 
+                  : 'Start buying and selling notes today'}
+              </p>
+            </div>
+
+            <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-2xl mb-6">
+              <button
+                type="button"
+                onClick={() => { setIsLogin(true); setError(''); setSuccess(''); }}
+                className={`flex-1 py-2.5 px-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
+                  isLogin
+                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
+                }`}
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Login</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setIsLogin(false); setError(''); setSuccess(''); }}
+                className={`flex-1 py-2.5 px-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
+                  !isLogin
+                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
+                }`}
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>Register</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white font-medium"
+                    required={!isLogin}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">
+                  Email Address
                 </label>
                 <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="John Doe"
-                  className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white"
-                  required={!isLogin}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="hello@example.com"
+                  className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white font-medium"
+                  required
                 />
               </div>
-            )}
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="hello@example.com"
-                className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white"
-                required
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white"
-                required
-              />
-            </div>
-
-            {!isLogin && (
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
-                  I want to...
+              <div className="space-y-1">
+                <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">
+                  Password
                 </label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white appearance-none"
-                >
-                  <option value="buyer">Buy Notes</option>
-                  <option value="uploader">Upload & Earn</option>
-                </select>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white font-medium"
+                  required
+                />
               </div>
-            )}
 
-            {error && (
-              <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl text-rose-600 dark:text-rose-400 text-sm font-medium animate-shake">
-                {error}
-              </div>
-            )}
+              {!isLogin && (
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">
+                    I want to...
+                  </label>
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white appearance-none font-bold"
+                  >
+                    <option value="buyer">Buy Notes</option>
+                    <option value="uploader">Upload & Earn</option>
+                  </select>
+                </div>
+              )}
 
-            {success && (
-              <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl text-emerald-600 dark:text-emerald-400 text-sm font-medium">
-                {success}
-              </div>
-            )}
+              {error && (
+                <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl text-rose-600 dark:text-rose-400 text-sm font-medium animate-shake">
+                  {error}
+                </div>
+              )}
 
-            <button
-              type="submit"
-              className="btn-premium w-full py-4 text-lg"
-            >
-              {isLogin ? 'Sign In' : 'Create Account'}
-            </button>
-          </form>
+              {success && (
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl text-emerald-600 dark:text-emerald-400 text-sm font-medium">
+                  {success}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="btn-premium w-full py-4 text-lg shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/30"
+              >
+                {isLogin ? 'Sign In' : 'Create Account'}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
