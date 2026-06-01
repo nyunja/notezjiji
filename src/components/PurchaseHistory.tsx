@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Download, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import { paymentAPI } from '../lib/api';
 import { getErrorMessage } from '../lib/errorUtils';
+import { ListItemSkeleton } from './LoadingSkeleton';
 
 interface Purchase {
   id: string;
@@ -129,8 +130,16 @@ export default function PurchaseHistory() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+        </div>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <ListItemSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }
