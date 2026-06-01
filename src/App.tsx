@@ -40,6 +40,14 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!user) {
+      setSuccess('');
+      setError('');
+      setPassword('');
+    }
+  }, [user]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
