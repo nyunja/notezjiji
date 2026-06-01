@@ -130,7 +130,7 @@ export default function PurchaseHistory() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
@@ -216,7 +216,7 @@ export default function PurchaseHistory() {
                     <div className="mt-3">
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
                           style={{ width: `${downloadProgress[purchase.item.id]}%` }}
                         ></div>
                       </div>
@@ -229,7 +229,7 @@ export default function PurchaseHistory() {
                 <button
                   onClick={() => handleDownload(purchase.item.id, purchase.item.title)}
                   disabled={downloading === purchase.item.id || purchase.download_count >= purchase.max_downloads}
-                  className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   <Download className="w-4 h-4" />
                   <span>

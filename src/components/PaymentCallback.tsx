@@ -45,11 +45,11 @@ export default function PaymentCallback({ onComplete }: PaymentCallbackProps) {
   }, [onComplete]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#faf4f0] to-[#f4e5db] flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-xl p-8 text-center">
         {status === 'verifying' && (
           <>
-            <Loader className="w-16 h-16 text-blue-600 mx-auto mb-4 animate-spin" />
+            <Loader className="w-16 h-16 text-indigo-600 mx-auto mb-4 animate-spin" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Processing Payment</h2>
             <p className="text-gray-600">{message}</p>
           </>
@@ -75,7 +75,7 @@ export default function PaymentCallback({ onComplete }: PaymentCallbackProps) {
             <p className="text-gray-600 mb-6">{message}</p>
             <button
               onClick={onComplete}
-              className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+              className="w-full py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition"
             >
               Return to Marketplace
             </button>

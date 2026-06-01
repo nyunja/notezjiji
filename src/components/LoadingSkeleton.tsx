@@ -97,9 +97,9 @@ export function MarketplaceGridSkeleton() {
 
 export function FullPageLoader() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-sky-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#faf4f0] to-[#f4e5db]">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-gray-600 font-medium">Loading...</p>
       </div>
     </div>
@@ -114,6 +114,9 @@ export function InlineLoader({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   };
 
   return (
-    <div className={`${sizeClasses[size]} border-blue-600 border-t-transparent rounded-full animate-spin`}></div>
+    <div className={`${sizeClasses[size]} border-indigo-600 border-t-transparent rounded-full animate-spin`}></div>
   );
 }
+
+
+
