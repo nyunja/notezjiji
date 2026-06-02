@@ -92,18 +92,26 @@ function App() {
 
   if (user) {
     return (
-      <div className="min-h-screen flex bg-slate-50 dark:bg-[#0A0C10]">
+      <div className="min-h-screen flex bg-slate-50 dark:bg-[#0A0C10] overflow-hidden w-full">
         <Sidebar 
           currentView={currentView} 
-          setCurrentView={setCurrentView} 
+          setCurrentView={(view) => { setCurrentView(view); setIsSidebarOpen(false); }} 
           isOpen={isSidebarOpen} 
           setIsOpen={setIsSidebarOpen} 
         />
         
-        <div className={`flex-1 flex flex-col transition-all duration-500 ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
-          <DashboardHeader />
+        {/* Mobile Overlay */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+        
+        <div className={`flex-1 flex flex-col transition-all duration-500 w-full ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
+          <DashboardHeader onMenuClick={() => setIsSidebarOpen(true)} />
           
-          <main className="p-8 overflow-y-auto max-h-[calc(100vh-80px)] no-scrollbar">
+          <main className="p-4 md:p-8 overflow-y-auto h-[calc(100dvh-80px)] w-full no-scrollbar">
             <AnimatePresence mode="wait">
               <AnimatedPage key={currentView}>
                 {currentView === 'home' && (
@@ -212,7 +220,7 @@ function App() {
       </div>
 
       {/* Right side: Login / Register Form */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-16 h-screen overflow-y-auto no-scrollbar">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-16 min-h-[100dvh] md:h-screen overflow-y-auto no-scrollbar">
         <div className="max-w-md w-full animate-slide-up">
           <div className="glass rounded-[2rem] shadow-2xl p-10 border-white/40 dark:border-slate-800/40 relative overflow-hidden">
             <div className="absolute -top-12 -right-12 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl"></div>

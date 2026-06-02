@@ -1,23 +1,35 @@
 import React from 'react';
-import { Search, Sun, Moon, User } from 'lucide-react';
+import { Search, Sun, Moon, User, Menu } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import NotificationCenter from './NotificationCenter';
 
-const DashboardHeader: React.FC = () => {
+interface DashboardHeaderProps {
+  onMenuClick?: () => void;
+}
+
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 w-full glass border-b border-slate-200/60 dark:border-slate-800/60 px-8 py-4 flex items-center justify-between">
-      {/* Search */}
-      <div className="relative w-96 group">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+    <header className="sticky top-0 z-40 w-full glass border-b border-slate-200/60 dark:border-slate-800/60 px-4 md:px-8 py-4 flex items-center justify-between">
+      <div className="flex items-center w-full md:w-auto">
+        <button 
+          onClick={onMenuClick}
+          className="p-2 mr-3 md:hidden rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:scale-110 active:scale-95 transition-all"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        {/* Search */}
+        <div className="relative w-full max-w-[200px] md:w-96 group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
         <input 
           type="text" 
           placeholder="Search for notes, courses, or authors..." 
           className="w-full pl-12 pr-4 py-2 bg-slate-100/50 dark:bg-slate-800/50 border border-transparent focus:border-indigo-500/30 focus:bg-white dark:focus:bg-slate-900 rounded-2xl outline-none transition-all"
         />
+        </div>
       </div>
 
       {/* Actions */}

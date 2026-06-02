@@ -67,8 +67,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, isOpen, 
   return (
     <aside 
       className={`
-        fixed left-0 top-0 h-screen glass z-50 transition-all duration-500 ease-in-out
-        ${isOpen ? 'w-64' : 'w-20'}
+        fixed left-0 top-0 h-[100dvh] glass z-50 transition-all duration-500 ease-in-out
+        ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full md:translate-x-0 md:w-20'}
       `}
     >
       <div className="flex flex-col h-full p-4">
@@ -126,7 +126,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, isOpen, 
         {/* Toggle Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+          className="absolute -right-3 top-20 w-6 h-6 bg-indigo-600 text-white rounded-full hidden md:flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
         >
           {isOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </button>
